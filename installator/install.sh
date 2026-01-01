@@ -13,8 +13,9 @@ set -e # Exit on error
 
 
 # --- Variables and Colors ---
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")") # Get absolute path to script's directory (installator/)
+REPO_DIR=$(dirname "$SCRIPT_DIR")           # Parent directory is the repo root
 INSTALL_DIR="$HOME/.local/share/speaker"
-REPO_DIR=$(pwd)
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
@@ -23,6 +24,7 @@ printf "${GREEN}Starting installation of the Speaker tool...${NC}\\n"
 
 # --- Step 1: Detect package manager and install mpg123 ---
 printf "\\n${YELLOW}Step 1: Checking system dependencies (mpg123)...${NC}\\n"
+
 
 if command -v mpg123 &> /dev/null; then
     echo "mpg123 is already installed."
