@@ -9,7 +9,7 @@ Dodatkowo, posiada opcjonalną funkcję streszczania długich tekstów przy uży
 - Czytanie tekstu na głos w języku polskim.
 - Pobieranie i czytanie treści ze stron internetowych (za pomocą `r.jina.ai`).
 - Opcjonalne streszczanie treści za pomocą modeli LLM (Gemini, OpenAI, DeepSeek, Ollama).
-- Konfiguracja kluczy API i kolejności modeli poprzez plik `.env`.
+- Konfiguracja kluczy API, kolejności modeli LLM oraz silników TTS poprzez plik `.env`.
 - Prosta instalacja i integracja z terminalem za pomocą polecenia `czytaj`.
 
 ## Instalacja
@@ -20,6 +20,7 @@ Instalacja jest obsługiwana przez skrypt/agenta. Jeśli czytasz ten plik, narz�
 2. Utworzenie wirtualnego środowiska Python (`venv`) i instalacja zależności (`gTTS`, `requests`, `python-dotenv`).
 3. Instalacja systemowego odtwarzacza `mpg123`.
 4. Dodanie funkcji `czytaj` do pliku `~/.bashrc`.
+5. Stworzenie pliku konfiguracyjnego `.env` na podstawie szablonu `.env.example` w katalogu `~/.local/share/czytacz/` w celu zdefiniowania kluczy API, kolejności modeli LLM (`LLM_FALLBACK_ORDER`) oraz kolejności silników TTS (`TTS_FALLBACK_ORDER`).
 
 ## Użycie
 

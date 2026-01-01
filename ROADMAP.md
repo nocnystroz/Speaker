@@ -42,3 +42,7 @@ This document outlines the development plan for the `Czytacz` tool.
     - Add pre-built support for more APIs like Anthropic Claude, Cohere, etc.
 - [ ] **Advanced recording management**:
     - Add features for saving, listing, and re-playing generated audio files. (Wymaga nowych ustaleń i Twojej wyraźnej zgody).
+- [ ] **Configurable TTS Engine**:
+    - Add support for Google's Gemini TTS as a primary engine.
+    - Implement a fallback mechanism to `gTTS`.
+    - Manage TTS provider order via `.env` file.
