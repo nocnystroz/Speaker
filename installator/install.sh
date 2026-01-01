@@ -11,6 +11,15 @@ fi
 
 set -e # Exit on error
 
+# --- Check for root privileges ---
+if [ "$EUID" -eq 0 ]; then
+    printf "${YELLOW}Script is running as root. Man page installation and mpg123 will be handled automatically.\\n${NC}"
+    RUN_AS_ROOT=true
+else
+    printf "${YELLOW}Script is NOT running as root. You will be prompted for sudo password for system dependencies, and man page installation will require manual steps.\\n${NC}"
+    RUN_AS_ROOT=false
+fi
+
 
 # --- Variables and Colors ---
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")") # Get absolute path to script's directory (installator/)
@@ -25,19 +34,40 @@ printf "${GREEN}Starting installation of the Speaker tool...${NC}\\n"
 # --- Step 1: Detect package manager and install mpg123 ---
 printf "\\n${YELLOW}Step 1: Checking system dependencies (mpg123)...${NC}\\n"
 
-
 if command -v mpg123 &> /dev/null; then
     echo "mpg123 is already installed."
 else
-    echo "mpg123 not found. Attempting to install..."
+    echo "mpg13 not found. Attempting to install..."
+    # Determine package manager and install mpg123
+    PACKAGE_MANAGER_INSTALL_CMD=""
     if command -v apt-get &> /dev/null; then
-        sudo apt-get update && sudo apt-get install -y mpg123
+        if [ "$RUN_AS_ROOT" = true ]; then
+            apt-get update && apt-get install -y mpg123
+        else
+            sudo apt-get update && sudo apt-get install -y mpg123
+        fi
+        PACKAGE_MANAGER_INSTALL_CMD="apt-get install -y"
     elif command -v dnf &> /dev/null; then
-        sudo dnf install -y mpg123
+        if [ "$RUN_AS_ROOT" = true ]; then
+            dnf install -y mpg123
+        else
+            sudo dnf install -y mpg123
+        fi
+        PACKAGE_MANAGER_INSTALL_CMD="dnf install -y"
     elif command -v yum &> /dev/null; then
-        sudo yum install -y mpg123
+        if [ "$RUN_AS_ROOT" = true ]; then
+            yum install -y mpg123
+        else
+            sudo yum install -y mpg123
+        fi
+        PACKAGE_MANAGER_INSTALL_CMD="yum install -y"
     elif command -v pacman &> /dev/null; then
-        sudo pacman -S --noconfirm mpg123
+        if [ "$RUN_AS_ROOT" = true ]; then
+            pacman -S --noconfirm mpg123
+        else
+            sudo pacman -S --noconfirm mpg123
+        fi
+        PACKAGE_MANAGER_INSTALL_CMD="pacman -S --noconfirm"
     else
         printf "${YELLOW}Could not automatically install mpg123. Please install it manually.${NC}\\n" >&2
         exit 1
@@ -105,6 +135,18 @@ if [ -f "$HOME/.zshrc" ]; then
     else
         echo "'speak' function already exists in ~/.zshrc. Skipping."
     fi
+fi
+
+# --- Step 5: Install Man Page (conditional on root privileges) ---
+printf "\\n${YELLOW}Step 5: Installing Man Page...${NC}\\n"
+if [ "$RUN_AS_ROOT" = true ]; then
+    cp "$REPO_DIR/speak.1.gz" "/usr/local/share/man/man1/"
+    mandb
+    echo "Man page for 'speak' installed."
+else
+    echo "Man page requires root privileges to install to system directories. Please install it manually if desired:"
+    printf "${YELLOW}sudo cp $REPO_DIR/speak.1.gz /usr/local/share/man/man1/\\n${NC}"
+    printf "${YELLOW}sudo mandb\\n${NC}"
 fi
 
 # --- Completion ---
