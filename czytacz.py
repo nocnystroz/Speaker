@@ -209,6 +209,25 @@ def read_aloud(text: str):
             os.remove(temp_file)
             print("Plik tymczasowy został usunięty.")
 
+def clean_text(text: str) -> str:
+    """Czyści tekst z typowych problematycznych znaków i nadmiarowych spacji."""
+    replacements = {
+        '\u201c': '"',  # “
+        '\u201d': '"',  # ”
+        '\u2018': "'",  # ‘
+        '\u2019': "'",  # ’
+        '\u2013': '-',  # – (en-dash)
+        '\u2014': '-',  # — (em-dash)
+        '\u00a0': ' ',  # non-breaking space
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    
+    # Zamiana wielokrotnych spacji/znaków nowej linii na pojedynczą spację
+    text = re.sub(r'\s+', ' ', text)
+    
+    return text.strip()
+
 def main():
     """Główna funkcja skryptu."""
     parser = argparse.ArgumentParser(
@@ -231,22 +250,25 @@ def main():
     content_to_process = " ".join(args.text_parts)
     
     # Sprawdzenie czy połączony tekst jest pojedynczym URL-em
-    # len(args.text_parts) == 1 zapobiega próbie traktowania "https://onet.pl i coś jeszcze" jako URL
     if len(args.text_parts) == 1 and is_url(content_to_process):
         content_for_reading = get_content_from_url(content_to_process)
     else:
         content_for_reading = content_to_process
 
+    # Czyszczenie tekstu przed dalszym przetwarzaniem
+    cleaned_content = clean_text(content_for_reading)
+
     if args.summarize:
         print("Aktywowano tryb streszczania.")
-        summary = summarize_text(content_for_reading)
+        summary = summarize_text(cleaned_content)
         if summary:
-            read_aloud(summary)
+            # Streszczenie również może wymagać czyszczenia
+            read_aloud(clean_text(summary))
         else:
             print("Streszczenie nie powiodło się. Czytam oryginalny tekst.", file=sys.stderr)
-            read_aloud(content_for_reading)
+            read_aloud(cleaned_content)
     else:
-        read_aloud(content_for_reading)
+        read_aloud(cleaned_content)
 
 if __name__ == "__main__":
     main()

@@ -28,10 +28,21 @@ This document outlines the development plan for the `Czytacz` tool.
 - [x] **Improved Text Extraction**:
     - [x] Enhance the default (non-LLM) logic for extracting the most relevant content from the text provided by Jina Reader.
 
-## Future Ideas (v0.3 and beyond)
+## Done (v0.3)
+
+- [x] **Configurable TTS Engine**:
+    - [x] Add support for Google's Cloud TTS as a primary engine (option "gemini").
+    - [x] Implement a fallback mechanism to `gTTS`.
+    - [x] Manage TTS provider order via `.env` file.
+- [x] **Improved Argument Parsing**:
+    - [x] The script now accepts multi-word text input without requiring quotes.
+- [x] **Basic Text Cleaning**:
+    - [x] Added a function to clean the text from common problematic characters (special quotes, dashes, etc.) before processing.
+
+## Future Ideas (v0.4 and beyond)
 
 - [ ] **Support for multiple TTS engines**:
-    - Allow choosing different text-to-speech services (e.g., cloud-based ones like Google WaveNet, ElevenLabs, or local ones).
+    - Allow choosing different text-to-speech services (e.g., ElevenLabs, or other local ones).
 - [ ] **Support for reading local files**:
     - Add the ability to read content from local `.txt`, `.md`, or other text-based files.
 - [ ] **Interactive mode**:
@@ -42,7 +53,3 @@ This document outlines the development plan for the `Czytacz` tool.
     - Add pre-built support for more APIs like Anthropic Claude, Cohere, etc.
 - [ ] **Advanced recording management**:
     - Add features for saving, listing, and re-playing generated audio files. (Wymaga nowych ustaleń i Twojej wyraźnej zgody).
-- [ ] **Configurable TTS Engine**:
-    - Add support for Google's Gemini TTS as a primary engine.
-    - Implement a fallback mechanism to `gTTS`.
-    - Manage TTS provider order via `.env` file.
