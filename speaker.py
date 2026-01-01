@@ -30,9 +30,22 @@ def _call_gemini(text: str, api_key: str, model: str, target_lang: str | None = 
     print(f"Attempting to use Gemini for summarization (model: {model})...")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
+
+    # Map common language codes to full names for better LLM understanding
+    lang_map = {
+        "pl": "Polish", "en": "English", "es": "Spanish", "fr": "French",
+        "de": "German", "it": "Italian", "pt": "Portuguese", "ru": "Russian",
+        "ja": "Japanese", "zh": "Chinese", "ko": "Korean", "ar": "Arabic",
+        "hi": "Hindi", "nl": "Dutch", "sv": "Swedish", "no": "Norwegian",
+        "da": "Danish", "fi": "Finnish", "cs": "Czech", "tr": "Turkish"
+    }
+
     if target_lang:
-        prompt = (f"Summarize the following text and translate the summary into {target_lang}. "
-                  f"Keep the summary concise (5-7 sentences) and focus on the most important information. Text:\n\n{text}")
+        # Convert language code to full name if it's a known code
+        lang_full = lang_map.get(target_lang.lower(), target_lang)
+        prompt = (f"Summarize the following text and translate the summary into {lang_full}. "
+                  f"Keep the summary concise (5-7 sentences) and focus on the most important information. "
+                  f"Reply ONLY with the {lang_full} translation of the summary, nothing else. Text:\n\n{text}")
     else:
         prompt = (f"Summarize the following text in a maximum of 5-7 sentences. "
                   f"Focus on the most important information and reply in the same language as the input. Text to summarize:\n\n{text}")
@@ -448,27 +461,88 @@ def _tts_gemini(text: str, temp_filename: str) -> bool:
         print(f"Google TTS Error: {e}", file=sys.stderr)
         return False
 
-def _tts_gtts(text: str, temp_filename: str) -> bool:
-    """Generates speech using the gTTS library (fallback)."""
+def _detect_language(text: str) -> str:
+    """Detects language from text using langdetect library (supports 55+ languages).
+    Falls back to simple character-based detection if langdetect is unavailable.
+    Returns ISO 639-1 code (e.g., 'en', 'pl', 'es').
+    """
+    # Try using langdetect library for accurate detection of 55+ languages
+    try:
+        from langdetect import detect
+        detected = detect(text)
+        return detected
+    except ImportError:
+        # Fallback to simple character-based detection
+        pass
+    except Exception:
+        # langdetect can fail on very short texts
+        pass
+
+    # Fallback: simple character-based detection for common European languages
+    # Polish-specific characters
+    polish_chars = set('ąćęłńóśźżĄĆĘŁŃÓŚŹŻ')
+    if any(char in polish_chars for char in text):
+        return 'pl'
+
+    # German-specific characters
+    german_chars = set('äöüßÄÖÜ')
+    if any(char in german_chars for char in text):
+        return 'de'
+
+    # French-specific characters
+    french_chars = set('àâæçéèêëïîôùûüÿœÀÂÆÇÉÈÊËÏÎÔÙÛÜŸŒ')
+    if any(char in french_chars for char in text):
+        return 'fr'
+
+    # Spanish-specific characters
+    spanish_chars = set('áéíóúñüÁÉÍÓÚÑÜ¿¡')
+    if any(char in spanish_chars for char in text):
+        return 'es'
+
+    # Default to English
+    return 'en'
+
+def _tts_gtts(text: str, temp_filename: str, tts_lang: str | None = None) -> bool:
+    """Generates speech using the gTTS library (fallback).
+
+    Args:
+        text: Text to convert to speech
+        temp_filename: Where to save the audio file
+        tts_lang: Optional language code. If None, auto-detects from text.
+    """
     from gtts import gTTS
     print("Attempting to use gTTS engine (fallback)...")
+
+    # If language not provided, auto-detect from text
+    if not tts_lang:
+        tts_lang = _detect_language(text)
+        print(f"Auto-detected language: {tts_lang}")
+    else:
+        print(f"Using specified language: {tts_lang}")
+
     try:
-        tts = gTTS(text, lang='pl')
+        tts = gTTS(text, lang=tts_lang)
         tts.save(temp_filename)
         return True
     except Exception as e:
         print(f"gTTS Error: {e}", file=sys.stderr)
         return False
 
-def read_aloud(text: str):
-    """Converts text to speech and plays it, using configured TTS engines."""
+def read_aloud(text: str, tts_lang: str | None = None):
+    """Converts text to speech and plays it, using configured TTS engines.
+
+    Args:
+        text: Text to read aloud
+        tts_lang: Optional language code for TTS. If provided, uses this language.
+                  If None, auto-detects language from text.
+    """
     if not text.strip():
         print("No text to read.")
         return
 
     print("Preparing speech...")
     fallback_order = os.getenv("TTS_FALLBACK_ORDER", "gtts,gemini").split(',')
-    
+
     temp_file = None
     success = False
     try:
@@ -481,7 +555,7 @@ def read_aloud(text: str):
                     success = True
                     break
             elif provider == "gtts":
-                if _tts_gtts(text, temp_file):
+                if _tts_gtts(text, temp_file, tts_lang):
                     success = True
                     break
         
@@ -562,11 +636,14 @@ def main():
         summary = summarize_text(cleaned_content, target_lang)
         if summary:
             # The summary might also need cleaning
-            read_aloud(clean_text(summary))
+            # If translation was used, pass target_lang to TTS so it reads in the correct language
+            read_aloud(clean_text(summary), tts_lang=target_lang)
         else:
             print("Summarization failed. Reading original text.", file=sys.stderr)
+            # Original content - auto-detect language
             read_aloud(cleaned_content)
     else:
+        # No summarization - auto-detect language from original text
         read_aloud(cleaned_content)
 
 if __name__ == "__main__":
