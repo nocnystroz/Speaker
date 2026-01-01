@@ -88,9 +88,39 @@ else
     printf "${YELLOW}sudo mandb\\n${NC}"
 fi
 
+# --- Step 4: Optional: Remove mpg123 (conditional on root privileges) ---
+printf "\\n${YELLOW}Step 4: Optional: Removing mpg123...${NC}\\n"
+if [ "$RUN_AS_ROOT" = true ]; then
+    read -r -p "Do you want to remove the 'mpg123' package from your system? (y/n) " REMOVE_MPG123_REPLY
+    echo
+    if [[ "$REMOVE_MPG123_REPLY" =~ ^[Yy]$ ]]
+    then
+        PACKAGE_MANAGER_UNINSTALL_CMD=""
+        if command -v apt-get &> /dev/null; then
+            PACKAGE_MANAGER_UNINSTALL_CMD="apt-get remove -y"
+        elif command -v dnf &> /dev/null; then
+            PACKAGE_MANAGER_UNINSTALL_CMD="dnf remove -y"
+        elif command -v yum &> /dev/null; then
+            PACKAGE_MANAGER_UNINSTALL_CMD="yum remove -y"
+        elif command -v pacman &> /dev/null; then
+            PACKAGE_MANAGER_UNINSTALL_CMD="pacman -Rns --noconfirm"
+        fi
+
+        if [ -n "$PACKAGE_MANAGER_UNINSTALL_CMD" ]; then
+            $PACKAGE_MANAGER_UNINSTALL_CMD mpg123
+            echo "mpg123 has been removed."
+        else
+            printf "${YELLOW}Could not determine package manager to remove mpg123. Please remove it manually.${NC}\\n"
+        fi
+    else
+        echo "'mpg123' removal skipped."
+    fi
+else
+    echo "The 'mpg123' package may still be installed. If you wish to remove it, you can do so manually, e.g., via:"
+    printf "${YELLOW}sudo apt-get remove mpg123${NC}\\n"
+fi
+
 # --- Completion ---
 printf "\\n${GREEN}Uninstallation completed successfully!${NC}\\n"
 echo "For the changes to take effect, please restart your terminal or run:"
-printf "${YELLOW}source ~/.bashrc${NC} or ${YELLOW}source ~/.zshrc${NC}"
-printf "\\nThe 'mpg123' package may still be installed. If you wish to remove it, you can do so manually, e.g., via:\\n"
-printf "${YELLOW}sudo apt-get remove mpg123${NC}\\n"
+printf "${YELLOW}source ~/.bashrc${NC} or ${YELLOW}source ~/.zshrc${NC}\\n"
