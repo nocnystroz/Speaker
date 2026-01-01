@@ -1,58 +1,64 @@
 #!/bin/bash
 
-# Skrypt deinstalacyjny dla narzędzia Czytacz
+# Uninstallation script for the Speaker tool
 
-# --- Zmienne i kolory ---
-INSTALL_DIR="$HOME/.local/share/czytacz"
+# --- Ensure script is run with bash ---
+if [ -z "$BASH_VERSION" ]; then
+    echo "Error: This script must be run with Bash. Please use 'bash installator/uninstall.sh'." >&2
+    exit 1
+fi
+
+# --- Variables and Colors ---
+INSTALL_DIR="$HOME/.local/share/speaker"
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}Ten skrypt usunie narzędzie Czytacz i jego konfigurację.${NC}"
-echo -e "${RED}UWAGA: To działanie jest nieodwracalne.${NC}"
+printf "${YELLOW}This script will remove the Speaker tool and its configuration.\n${NC}"
+printf "${RED}WARNING: This action is irreversible.\n${NC}"
 
-# Pytanie o potwierdzenie
-read -p "Czy na pewno chcesz kontynuować? (t/n) " -n 1 -r
+# Confirmation prompt
+read -r -p "Are you sure you want to continue? (y/n) " REPLY
 echo
-if [[ ! $REPLY =~ ^[Tt]$ ]]
+if [[ ! "$REPLY" =~ ^[Yy]$ ]]
 then
-    echo "Deinstalacja anulowana."
+    echo "Uninstallation cancelled."
     exit 1
 fi
 
-# --- Krok 1: Usunięcie funkcji z plików konfiguracyjnych powłoki ---
-echo -e "\n${YELLOW}Krok 1: Usuwanie funkcji 'czytaj' z konfiguracji powłoki...${NC}"
+# --- Step 1: Remove the function from shell configuration files ---
+printf "\n${YELLOW}Step 1: Removing 'speak' function from shell configuration...\n${NC}"
 
-# Usunięcie z .bashrc
+# Remove from .bashrc
 if [ -f "$HOME/.bashrc" ]; then
-    # Tworzenie kopii zapasowej
+    # Create a backup
     cp "$HOME/.bashrc" "$HOME/.bashrc.bak.$(date +%F)"
-    # Użycie sed do usunięcia bloku funkcji
-    sed -i '/# --- Funkcja dla narzędzia Czytacz ---/,/}/d' "$HOME/.bashrc"
-    echo "Usunięto funkcję z ~/.bashrc"
+    # Use sed to remove the function block
+    sed -i '/# --- Function for the Speaker tool ---/,/}/d' "$HOME/.bashrc"
+    echo "Removed function from ~/.bashrc"
 fi
 
-# Usunięcie z .zshrc
+# Remove from .zshrc
 if [ -f "$HOME/.zshrc" ]; then
-    # Tworzenie kopii zapasowej
+    # Create a backup
     cp "$HOME/.zshrc" "$HOME/.zshrc.bak.$(date +%F)"
-    sed -i '/# --- Funkcja dla narzędzia Czytacz ---/,/}/d' "$HOME/.zshrc"
-    echo "Usunięto funkcję z ~/.zshrc"
+    sed -i '/# --- Function for the Speaker tool ---/,/}/d' "$HOME/.zshrc"
+    echo "Removed function from ~/.zshrc"
 fi
 
-# --- Krok 2: Usunięcie katalogu aplikacji ---
-echo -e "\n${YELLOW}Krok 2: Usuwanie katalogu aplikacji...${NC}"
+# --- Step 2: Remove the application directory ---
+printf "\n${YELLOW}Step 2: Removing application directory...\n${NC}"
 if [ -d "$INSTALL_DIR" ]; then
     rm -rf "$INSTALL_DIR"
-    echo "Usunięto katalog $INSTALL_DIR"
+    echo "Removed directory $INSTALL_DIR"
 else
-    echo "Katalog $INSTALL_DIR nie istnieje. Pomijam."
+    echo "Directory $INSTALL_DIR does not exist. Skipping."
 fi
 
-# --- Zakończenie ---
-echo -e "\n${GREEN}Deinstalacja zakończona pomyślnie!${NC}"
-echo "Aby zmiany weszły w życie, uruchom ponownie terminal lub wpisz:"
-echo -e "${YELLOW}source ~/.bashrc${NC} lub ${YELLOW}source ~/.zshrc${NC}"
-echo -e "\nPozostałością może być pakiet 'mpg123'. Jeśli chcesz go usunąć, możesz to zrobić ręcznie, np. przez:"
-echo -e "${YELLOW}sudo apt-get remove mpg123${NC}"
+# --- Completion ---
+printf "\n${GREEN}Uninstallation completed successfully!\n${NC}"
+echo "For the changes to take effect, please restart your terminal or run:"
+printf "${YELLOW}source ~/.bashrc${NC} or ${YELLOW}source ~/.zshrc${NC}"
+printf "\nThe 'mpg123' package may still be installed. If you wish to remove it, you can do so manually, e.g., via:\n"
+printf "${YELLOW}sudo apt-get remove mpg123${NC}\n"

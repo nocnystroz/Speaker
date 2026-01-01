@@ -1,6 +1,6 @@
-# Roadmap for Czytacz
+# Roadmap for Speaker
 
-This document outlines the development plan for the `Czytacz` tool.
+This document outlines the development plan for the `Speaker` tool.
 
 ## Done (v0.1)
 
@@ -60,4 +60,4 @@ This document outlines the development plan for the `Czytacz` tool.
 - [ ] **Support for more LLM providers**:
     - Add pre-built support for more APIs like Anthropic Claude, Cohere, etc.
 - [ ] **Advanced recording management**:
-    - Add features for saving, listing, and re-playing generated audio files. (Wymaga nowych ustaleń i Twojej wyraźnej zgody).
+    - Add features for saving, listing, and re-playing generated audio files. (Requires new discussion and your explicit consent).

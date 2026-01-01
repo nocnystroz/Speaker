@@ -1,102 +1,103 @@
-# Czytacz
+# Speaker
 
-Czytacz to proste narzędzie wiersza poleceń, które potrafi przeczytać na głos dowolny tekst lub treść wskazanej strony internetowej. Używa syntezatora mowy Google (gTTS) do generowania mowy.
+Speaker is a simple command-line tool that can read any given text or the content of a specified webpage aloud. It uses Google's Text-to-Speech engines for speech synthesis.
 
-Dodatkowo, posiada opcjonalną funkcję streszczania długich tekstów przy użyciu skonfigurowanego modelu językowego (LLM) przed ich przeczytaniem.
+It also has an optional feature to summarize long texts using a configured Large Language Model (LLM) before reading them.
 
-## Główne funkcje
+## Main Features
 
-- Czytanie tekstu na głos w języku polskim.
-- Pobieranie i czytanie treści ze stron internetowych (za pomocą `r.jina.ai`).
-- Opcjonalne streszczanie treści za pomocą modeli LLM (Gemini, OpenAI, DeepSeek, Ollama).
-- Konfiguracja kluczy API, kolejności modeli LLM oraz silników TTS poprzez plik `.env`.
-- Prosta instalacja i integracja z terminalem za pomocą polecenia `czytaj`.
+- Reads text aloud (primarily in Polish).
+- Fetches and reads content from websites (using `r.jina.ai`).
+- Optionally summarizes content using LLM providers (Gemini, OpenAI, etc.).
+- Configurable API keys, LLM provider order, and TTS engine order via a `.env` file.
+- Simple installation and shell integration with the `speak` command.
+- Includes installer and uninstaller scripts for easy management.
 
-## Instalacja
+## Installation
 
-Główną i zalecaną metodą instalacji jest użycie dołączonego skryptu `install.sh`.
+The main and recommended installation method is to use the included `install.sh` script.
 
 ```bash
-# Upewnij się, że skrypt ma uprawnienia do wykonania
+# Ensure the script is executable
 chmod +x installator/install.sh
 
-# Uruchom instalator z głównego katalogu repozytorium
+# Run the installer from the main repository directory
 bash installator/install.sh
 ```
 
-Skrypt automatycznie:
-1.  Wykryje menedżera pakietów i zainstaluje `mpg123`.
-2.  Stworzy katalog `~/.local/share/czytacz` i skopiuje tam pliki aplikacji.
-3.  Stworzy wirtualne środowisko Python i zainstaluje zależności z `requirements.txt`.
-4.  Doda polecenie `czytaj` do Twojej powłoki (`.bashrc` lub `.zshrc`).
+The script will automatically:
+1.  Detect your package manager and install `mpg123`.
+2.  Create the `~/.local/share/speaker` directory and copy the application files there.
+3.  Create a Python virtual environment and install dependencies from `requirements.txt`.
+4.  Add the `speak` command to your shell (`.bashrc` or `.zshrc`).
 
-Po zakończeniu instalacji, uruchom ponownie terminal lub odśwież sesję poleceniem `source ~/.bashrc` (lub `source ~/.zshrc`).
+After the installation is complete, restart your terminal or refresh the session with `source ~/.bashrc` (or `source ~/.zshrc`).
 
-## Użycie
+## Usage
 
 ```bash
-# Czytanie prostego tekstu (cudzysłowy nie są już wymagane)
-czytaj To jest przykładowy tekst do przeczytania.
+# Read a simple text (quotes are not required)
+speak This is a sample text to be read aloud.
 
-# Czytanie treści strony internetowej
-czytaj https://example.com
+# Read the content of a website
+speak https://example.com
 
-# Streszczenie i przeczytanie długiego tekstu
-czytaj -s To jest bardzo długi tekst, który chcemy streścić...
+# Summarize and read a long text
+speak -s This is a very long text that we want to summarize...
 ```
 
-## Instalacja Strony Podręcznika (`man czytaj`)
+## Man Page Installation (`man speak`)
 
-Aby móc korzystać z pomocy systemowej `man czytaj`, należy zainstalować dołączony plik strony podręcznika. Plik `czytaj.1.gz` znajduje się w tym repozytorium.
+To use the system help `man speak`, you need to install the included man page file. The `speak.1.gz` file is located in this repository.
 
-1.  **Skopiuj plik `czytaj.1.gz` do katalogu systemowego:**
+1.  **Copy the `speak.1.gz` file to the system directory:**
     ```bash
-    sudo cp czytaj.1.gz /usr/local/share/man/man1/
+    sudo cp speak.1.gz /usr/local/share/man/man1/
     ```
-    *Uwaga: Polecenie `cp` automatycznie nadpisze starą wersję pliku, jeśli już istnieje. Nie trzeba jej wcześniej usuwać.*
+    *Note: The `cp` command will automatically overwrite the old version of the file if it already exists.*
 
-2.  **Zaktualizuj bazę danych stron podręcznika:**
+2.  **Update the man page database:**
     ```bash
     sudo mandb
     ```
 
-Po wykonaniu tych kroków polecenie `man czytaj` powinno działać poprawnie.
+After these steps, the `man speak` command should work correctly.
 
 ---
 
-## Deinstalacja (Jak całkowicie usunąć narzędzie)
+## Uninstallation
 
-Zalecaną metodą deinstalacji jest użycie skryptu `uninstall.sh`.
+The recommended uninstallation method is to use the `uninstall.sh` script.
 
 ```bash
-# Upewnij się, że skrypt ma uprawnienia do wykonania
+# Ensure the script is executable
 chmod +x installator/uninstall.sh
 
-# Uruchom deinstalator
+# Run the uninstaller
 bash installator/uninstall.sh
 ```
 
-Skrypt poprosi o potwierdzenie, a następnie automatycznie usunie funkcję `czytaj` z konfiguracji powłoki oraz skasuje cały katalog aplikacji `~/.local/share/czytacz`.
+The script will ask for confirmation, then automatically remove the `speak` function from your shell configuration and delete the entire `~/.local/share/speaker` application directory.
 
-### Ręczna deinstalacja
+### Manual Uninstallation
 
-Jeśli z jakiegoś powodu wolisz usunąć narzędzie ręcznie, poniżej znajdują się kroki, które wykonuje skrypt:
+If for some reason you prefer to remove the tool manually, here are the steps the script performs:
 
-#### 1. Usunięcie funkcji z `.bashrc` / `.zshrc`
-Użyj poniższej komendy, aby automatycznie usunąć blok funkcji `czytaj` (zalecane utworzenie kopii zapasowej `cp ~/.bashrc ~/.bashrc.bak`).
+#### 1. Remove the function from `.bashrc` / `.zshrc`
+Use the following command to automatically remove the `speak` function block (creating a backup first is recommended: `cp ~/.bashrc ~/.bashrc.bak`).
 ```bash
-sed -i '/# --- Funkcja dla narzędzia Czytacz ---/,/}/d' ~/.bashrc
-sed -i '/# --- Funkcja dla narzędzia Czytacz ---/,/}/d' ~/.zshrc
+sed -i '/# --- Function for the Speaker tool ---/,/}/d' ~/.bashrc
+sed -i '/# --- Function for the Speaker tool ---/,/}/d' ~/.zshrc
 ```
 
-#### 2. Usunięcie katalogu z aplikacją
+#### 2. Remove the application directory
 ```bash
-rm -rf ~/.local/share/czytacz
+rm -rf ~/.local/share/speaker
 ```
 
-#### 3. Odświeżenie terminala
+#### 3. Refresh the terminal
 ```bash
 source ~/.bashrc 
-# lub
+# or
 source ~/.zshrc
 ```
