@@ -18,6 +18,15 @@ if [ "$EUID" -eq 0 ]; then
 else
     printf "${YELLOW}Script is NOT running as root. You will be prompted for sudo password for system dependencies, and man page installation will require manual steps.\\n${NC}"
     RUN_AS_ROOT=false
+
+    printf "\\n${YELLOW}Proceeding without root privileges means some system-level components (like 'mpg123' and the man page) will either require manual 'sudo' input during the process or manual installation afterwards.\\n${NC}"
+    read -r -p "Do you want to proceed with a non-root installation? (y/n) " REPLY
+    echo
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]
+    then
+        echo "Installation cancelled."
+        exit 1
+    fi
 fi
 
 

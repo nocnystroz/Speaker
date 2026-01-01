@@ -13,6 +13,15 @@ if [ "$EUID" -eq 0 ]; then
 else
     printf "${YELLOW}Script is NOT running as root. You will need to remove the man page manually if desired.\\n${NC}"
     RUN_AS_ROOT=false
+
+    printf "\\n${YELLOW}Proceeding without root privileges means that the man page will need to be removed manually via 'sudo'.\\n${NC}"
+    read -r -p "Do you want to proceed with a non-root uninstallation? (y/n) " REPLY
+    echo
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]
+    then
+        echo "Uninstallation cancelled."
+        exit 1
+    fi
 fi
 
 # --- Variables and Colors ---
@@ -25,7 +34,7 @@ NC='\033[0m' # No Color
 printf "${YELLOW}This script will remove the Speaker tool and its configuration.\\n${NC}"
 printf "${RED}WARNING: This action is irreversible.\\n${NC}"
 
-# Confirmation prompt
+# Confirmation prompt for general uninstallation
 read -r -p "Are you sure you want to continue? (y/n) " REPLY
 echo
 if [[ ! "$REPLY" =~ ^[Yy]$ ]]
